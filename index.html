@@ -5,6 +5,8 @@
     <title>Konva demo</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/konva@9.2.0/konva.min.js"></script>
+    <link href="https://kendo.cdn.telerik.com/themes/11.0.2/default/default-main.css" rel="stylesheet" />
+    <script src="https://kendo.cdn.telerik.com/2025.2.702/js/kendo.all.min.js"></script>
 </head>
 <body>
 
@@ -14,27 +16,27 @@
 <script>
     
     class Point {
-        constructor({ id, x, y, radius = 40, color = 'red', comments = [] }) {
+        constructor({ id, x, y, radius, color = 'red', comments = [] }) {
             this.id = id;
             this.x = x;
             this.y = y;
-            this.radius = radius;
+            this.radius = comments.length > 0 ? 30 + comments.length * 10 : 30;
             this.color = color;
             this.comments = [];
             
             this.circle = new Konva.Circle({
                 x: this.x,
                 y: this.y,
-                radius: radius,
+                radius: this.radius,
                 fill: color,
                 stroke: 'black',
                 strokeWidth: 2,
                 draggable: true
             });
 
-            circle.on('mouseover', () => this.opacity(0.3));
-            circle.on('mouseout', () => this.opacity(1));
-            circle.on('dblclick', () => this.destroy());
+            this.circle.on('mouseover', () => this.circle.opacity(0.3));
+            this.circle.on('mouseout', () => this.circle.opacity(1));
+            this.circle.on('dblclick', () => this.circle.destroy());
 
             layer.add(this.circle);
             layer.draw();
@@ -50,13 +52,22 @@
     const layer = new Konva.Layer();
     stage.add(layer);
 
+    const centerX = stage.width() / 2;
+    const centerY = stage.height() / 2;
+
+
     const points = [];
-    $("addPointBtn").on("click", () => {
+    $("#addPointBtn").on("click", () => {
         const newPoint = new Point({
             id: Date.now(),
-            x: Math.random() * stage.width(),
-            y: Math.random() * stage.height(),
-            color: Konva.Util.getRandomColor()
+            x: centerX + (Math.random() - 0.5) * 1000,
+            y: centerY + (Math.random() - 0.5) * 600,
+            color: Konva.Util.getRandomColor(),
+            comments: [
+                { text: "Первый" },
+                { text: "Второй" },
+                { text: "Третий" }
+            ]
         });
         points.push(newPoint);
     })
