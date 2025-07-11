@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Konva demo</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/konva@9.2.0/konva.min.js"></script>
+</head>
+<body>
+
+<button id="addPointBtn">Добавить точку</button>
+<div id="container"></div>
+
+<script>
+    
+    class Point {
+        constructor({ id, x, y, radius = 40, color = 'red', comments = [] }) {
+            this.id = id;
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            this.color = color;
+            this.comments = [];
+            
+            this.circle = new Konva.Circle({
+                x: this.x,
+                y: this.y,
+                radius: radius,
+                fill: color,
+                stroke: 'black',
+                strokeWidth: 2,
+                draggable: true
+            });
+
+            circle.on('mouseover', () => this.opacity(0.3));
+            circle.on('mouseout', () => this.opacity(1));
+            circle.on('dblclick', () => this.destroy());
+
+            layer.add(this.circle);
+            layer.draw();
+        }
+    }
+    
+    const stage = new Konva.Stage({
+        container: 'container',
+        width: window.innerWidth,
+        height: window.innerHeight,
+    });
+
+    const layer = new Konva.Layer();
+    stage.add(layer);
+
+    const points = [];
+    $("addPointBtn").on("click", () => {
+        const newPoint = new Point({
+            id: Date.now(),
+            x: Math.random() * stage.width(),
+            y: Math.random() * stage.height(),
+            color: Konva.Util.getRandomColor()
+        });
+        points.push(newPoint);
+    })
+    layer.draw();
+</script>
+</body>
+</html>
