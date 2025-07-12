@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Konva demo</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/konva@9.2.0/konva.min.js"></script>
     <link href="https://kendo.cdn.telerik.com/themes/11.0.2/default/default-main.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/konva@9.2.0/konva.min.js"></script>
     <script src="https://kendo.cdn.telerik.com/2025.2.702/js/kendo.all.min.js"></script>
 </head>
 <body>
 
 <button id="addPointBtn">Добавить точку</button>
 <div id="container"></div>
+
+<div id="comments-window" style="display:none;">
+    <div id="comments-grid"></div>
+</div>
+
 
 <script>
     
@@ -22,7 +27,7 @@
             this.y = y;
             this.radius = comments.length > 0 ? 30 + comments.length * 10 : 30;
             this.color = color;
-            this.comments = [];
+            this.comments = comments;
             
             this.circle = new Konva.Circle({
                 x: this.x,
@@ -34,14 +39,66 @@
                 draggable: true
             });
 
+            this.commentLabels = [];
+            this.drawComments();
+            
             this.circle.on('mouseover', () => this.circle.opacity(0.3));
             this.circle.on('mouseout', () => this.circle.opacity(1));
-            this.circle.on('dblclick', () => this.circle.destroy());
+            this.circle.on('dblclick', () => {
+                this.circle.destroy();
+                this.commentLabels.forEach(label => label.destroy());
+                layer.draw();
+            });
+            this.circle.on('dragmove', () => this.updateCommentsPosition());
 
             layer.add(this.circle);
             layer.draw();
         }
+
+        drawComments() {
+            this.comments.forEach((comment, index) => {
+                const label = new Konva.Label({
+                    x: this.circle.x(),
+                    y: this.circle.y() + this.circle.radius() + 25 + index * 25
+                });
+
+                label.add(new Konva.Tag({
+                    fill: comment.backgroundColor || 'lightyellow',
+                    pointerDirection: 'down',
+                    pointerWidth: 0,
+                    pointerHeight: 0,
+                    lineJoin: 'round',
+                    cornerRadius: 4
+                }));
+
+                label.add(new Konva.Text({
+                    text: comment.text,
+                    fontSize: 14,
+                    padding: 4,
+                    fill: 'black'
+                }));
+
+                this.commentLabels.push(label);
+                layer.add(label);
+            });
+            layer.draw();
+        }
+
+        updateCommentsPosition() {
+            this.commentLabels.forEach((label, index) => {
+                label.position({
+                    x: this.circle.x(),
+                    y: this.circle.y() + this.circle.radius() + 25 + index * 25,
+                });
+            });
+            layer.batchDraw();
+        }
+        
     }
+    
+
+    
+    
     
     const stage = new Konva.Stage({
         container: 'container',
@@ -64,9 +121,12 @@
             y: centerY + (Math.random() - 0.5) * 600,
             color: Konva.Util.getRandomColor(),
             comments: [
-                { text: "Первый" },
-                { text: "Второй" },
-                { text: "Третий" }
+                { text: "Привет!", backgroundColor: 'lightblue' },
+                { text: "Привет!", backgroundColor: 'lightblue' },
+                { text: "Привет!", backgroundColor: 'lightblue' },
+                { text: "Привет!", backgroundColor: 'lightblue' },
+                { text: "Привет!", backgroundColor: 'lightblue' },
+                { text: "Привет!", backgroundColor: 'lightblue' }
             ]
         });
         points.push(newPoint);
