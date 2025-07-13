@@ -1,0 +1,48 @@
+# Build results
+bin/
+obj/
+
+# Rider settings
+.idea/
+*.sln.iml
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+
+# Packages
+*.nupkg
+*.snupkg
+
+# VS Code settings (если есть)
+.vscode/
+
+# Rider workspace
+.idea/
+
+# NuGet packages folder
+packages/
+
+# dotnet tools
+*.dotnet_tools/
+
+# Rider system folders
+.idea/
+
+# Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+# Windows thumbnails cache
+Thumbs.db
+
+# Rider local history
+.idea/.idea.LocalHistory/
+
+# Misc
+*.vs/

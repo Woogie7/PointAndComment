@@ -1,7 +1,8 @@
+import { openEditCommentDialog } from './dialogs.js';
 export class Comment{
-    constructor({text, color, parent}) {
+    constructor({text, backgroundColor, parent}) {
         this.text = text;
-        this.color = color;
+        this.backgroundColor = backgroundColor;
         this.parent  = parent ;
         
         this.label = null;
@@ -15,7 +16,7 @@ export class Comment{
         });
 
         this.label.add(new Konva.Tag({
-            fill: this.color || 'lightyellow',
+            fill: this.backgroundColor  || 'lightyellow',
             pointerDirection: 'down',
             pointerWidth: 0,
             pointerHeight: 0,
@@ -33,7 +34,20 @@ export class Comment{
 
         this.label.add(this.textNode);
 
-        this.label.on('click', () => this.edit());
+        this.label.on('contextmenu', (evt) =>
+        {
+            evt.evt.preventDefault();
+
+            openEditCommentDialog(this.text).then(result => {
+                if (result) {
+                    this.update(result);
+                }
+            });
+        });
+        
+        this.label.on('dblclick', () => {
+            this.label.destroy();
+        })
 
         layer.add(this.label);
         layer.draw();
@@ -47,42 +61,25 @@ export class Comment{
 
         this.label.position({ x: bubbleX, y: bubbleY });
     }
+    update({ text = this.text, backgroundColor = this.backgroundColor }) {
+        this.text = text;
+        this.backgroundColor = backgroundColor;
 
-    edit() {
-        const $dlg = $(`
-    <div>
-      <label for="editText">Редактировать комментарий:</label>
-      <textarea id="editText" rows="4" style="width:100%">${this.text}</textarea>
-    </div>
-  `).appendTo('body');
+        if (this.textNode) {
+            this.textNode.text(this.text);
+        }
 
-        const dialog = $dlg.kendoDialog({
-            width: 400,
-            modal: true,
-            title: "Редактирование комментария",
-            actions: [
-                { text: "Отмена" },
-                {
-                    text: "Сохранить",
-                    primary: true,
-                    action: () => {
-                        const newText = $dlg.find('#editText').val().trim();
-                        if (!newText) return false;
+        if (this.label) {
+            const tag = this.label.findOne('Tag');
+            if (tag) tag.fill(this.backgroundColor);
+        }
+    }
 
-                        this.text = newText;                    
-                        this.textNode.text(newText);          
-                        this.parent.updateCommentsPosition();  
-
-                        return true;
-                    }
-                }
-            ],
-            close: function () {
-                this.destroy();
-                $dlg.remove();
-            }
-        }).data('kendoDialog');
-
-        dialog.open();
+    destroy() {
+        if (this.label) {
+            this.label.destroy();
+            this.label = null;
+            this.textNode = null;
+        }
     }
 }

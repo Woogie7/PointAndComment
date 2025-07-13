@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDo.Api", "ToDo.Api\ToDo.Api.csproj", "{477155C9-99DE-44E9-976E-0FAB7C58CBC9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PointAndComment.Domain", "PointAndComment.Domain\PointAndComment.Domain.csproj", "{FA02AD7B-8274-4C75-8E9D-4CF82563D125}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{477155C9-99DE-44E9-976E-0FAB7C58CBC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{477155C9-99DE-44E9-976E-0FAB7C58CBC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{477155C9-99DE-44E9-976E-0FAB7C58CBC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA02AD7B-8274-4C75-8E9D-4CF82563D125}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA02AD7B-8274-4C75-8E9D-4CF82563D125}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA02AD7B-8274-4C75-8E9D-4CF82563D125}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA02AD7B-8274-4C75-8E9D-4CF82563D125}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
