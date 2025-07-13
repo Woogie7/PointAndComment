@@ -12,8 +12,6 @@ stage.add(layer);
 const centerX = stage.width() / 2;
 const centerY = stage.height() / 2;
 
-
-const points = [];
 $("#addPointBtn").on("click", () => {
     const newPoint = new Point({
         id: Date.now(),
@@ -21,11 +19,9 @@ $("#addPointBtn").on("click", () => {
         y: centerY + (Math.random() - 0.5) * 600,
         color: Konva.Util.getRandomColor(),
         comments: [
-            { text: "Привет!", backgroundColor: 'lightblue' }
         ],
         layer: layer,
     });
     console.log("asdas")
-    points.push(newPoint);
 })
 layer.draw();
