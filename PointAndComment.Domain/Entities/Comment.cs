@@ -5,21 +5,19 @@ public class Comment
     public Guid Id { get; private set; }
     public string Text { get; private set; }
     public string BackgroundColor { get; private set; }
-
-    public Comment(Guid id, string text, string backgroundColor)
+    public Guid PointId { get; private set; }
+    public virtual Point Point { get; private set; } = null!;
+    private Comment() { }
+    public Comment(string text, string backgroundColor)
     {
-        Id = id == Guid.Empty ? Guid.NewGuid() : id;
         Text = text;
         BackgroundColor = backgroundColor;
     }
-
-    public void UpdateText(string text)
+    public void SetPoint(Point point)
     {
-        Text = text;
+        Point = point;
+        PointId = point.Id;
     }
-
-    public void UpdateBackgroundColor(string color)
-    {
-        BackgroundColor = color;
-    }
+    public void UpdateText(string text) => Text = text;
+    public void UpdateBackgroundColor(string color) => BackgroundColor = color;
 }

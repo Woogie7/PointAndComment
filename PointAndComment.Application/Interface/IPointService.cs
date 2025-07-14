@@ -5,7 +5,8 @@ namespace PointAndComment.Application.Interface;
 public interface IPointService
 {
     Task<List<PointDto>> GetAllAsync();
-    Task AddAsync(PointDto dto);
+    Task<PointDto> GetByIdAsync(Guid id);
+    Task<PointDto> AddAsync(PointDto dto);
     Task DeleteAsync(Guid id);
     Task UpdateColorAsync(Guid pointId, string newColor);
 

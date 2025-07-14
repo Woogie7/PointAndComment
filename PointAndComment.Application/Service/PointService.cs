@@ -33,18 +33,34 @@ public class PointService : IPointService
         }).ToList();
     }
 
-    public async Task AddAsync(PointDto dto)
+    public async Task<PointDto> GetByIdAsync(Guid id)
     {
-        var point = new Point(Guid.NewGuid(), dto.X, dto.Y, dto.Radius, dto.Color);
+        var point = await _repo.GetByIdAsync(id);
 
-        foreach (var commentDto in dto.Comments)
+        return new PointDto
         {
-            var comment = new Comment(Guid.NewGuid(), commentDto.Text, commentDto.BackgroundColor);
-            point.AddComment(comment);
-        }
+            Id = point.Id,
+            X = point.X,
+            Y = point.Y,
+            Radius = point.Radius,
+            Color = point.Color,
+            Comments = point.Comments.Select(c => new CommentDto
+            {
+                Id = c.Id,
+                Text = c.Text,
+                BackgroundColor = c.BackgroundColor
+            }).ToList()
+        };
+    }
+
+    public async Task<PointDto> AddAsync(PointDto dto)
+    {
+        var point = new Point(dto.X, dto.Y, dto.Radius, dto.Color);
 
         await _repo.AddAsync(point);
         await _repo.SaveChangesAsync();
+
+        return point.ToDto();
     }
 
     public async Task DeleteAsync(Guid id)
@@ -56,40 +72,34 @@ public class PointService : IPointService
     public async Task UpdateColorAsync(Guid pointId, string newColor)
     {
         var point = await _repo.GetByIdAsync(pointId);
-        if (point is null) return;
-
-        point.UpdateColor(newColor);
+        point?.UpdateColor(newColor);
         await _repo.UpdateAsync(point);
         await _repo.SaveChangesAsync();
     }
 
-    public async Task UpdatePositionAsync(Guid pointId, PointPositionDto positionPosition)
+    public async Task UpdatePositionAsync(Guid pointId, PointPositionDto position)
     {
         var point = await _repo.GetByIdAsync(pointId);
-        if (point is null) return;
-
-        point.UpdatePosition(positionPosition.X, positionPosition.Y);
+        point?.UpdatePosition(position.X, position.Y);
         await _repo.UpdateAsync(point);
         await _repo.SaveChangesAsync();
     }
 
     public async Task AddCommentAsync(Guid pointId, CommentDto dto)
     {
-        var point = await _repo.GetByIdAsync(pointId);
-        if (point == null) return;
+        var point = await _repo.GetByIdWithCommentsAsync(pointId);
+        if (point == null) throw new Exception("Point not found");
 
-        var comment = new Comment(Guid.NewGuid(), dto.Text, dto.BackgroundColor);
-        point.AddComment(comment);
+        point.AddComment(dto.Text, dto.BackgroundColor);
 
-        await _repo.UpdateAsync(point);
         await _repo.SaveChangesAsync();
     }
 
+
     public async Task UpdateCommentAsync(Guid commentId, CommentDto dto)
     {
-        var allPoints = await _repo.GetAllAsync();
-        var point = allPoints.FirstOrDefault(p => p.Comments.Any(c => c.Id == commentId));
-        if (point == null) return;
+        var point = await _repo.GetByCommentIdAsync(commentId);
+        if (point == null) throw new Exception("Comment not found");
 
         var comment = point.Comments.First(c => c.Id == commentId);
 
@@ -109,14 +119,33 @@ public class PointService : IPointService
 
     public async Task DeleteCommentAsync(Guid commentId)
     {
-        var allPoints = await _repo.GetAllAsync();
-        var point = allPoints.FirstOrDefault(p => p.Comments.Any(c => c.Id == commentId));
-        if (point == null) return;
-
+        var point = await _repo.GetByCommentIdAsync(commentId)
+                    ?? throw new KeyNotFoundException("Comment not found");
+        
         var comment = point.Comments.First(c => c.Id == commentId);
+        
         point.RemoveComment(comment);
-
-        await _repo.UpdateAsync(point);
+        
         await _repo.SaveChangesAsync();
+    }
+}
+public static class PointMapper
+{
+    public static PointDto ToDto(this Point point)
+    {
+        return new PointDto
+        {
+            Id = point.Id,
+            X = point.X,
+            Y = point.Y,
+            Radius = point.Radius,
+            Color = point.Color,
+            Comments = point.Comments.Select(c => new CommentDto
+            {
+                Id = c.Id,
+                Text = c.Text,
+                BackgroundColor = c.BackgroundColor
+            }).ToList()
+        };
     }
 }

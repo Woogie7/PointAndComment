@@ -22,9 +22,11 @@ public class PointsAndCommentsDbContext : DbContext
             entity.Property(p => p.Y).IsRequired();
             entity.Property(p => p.Radius).IsRequired();
 
-            entity.HasMany(p => p.Comments)
-                .WithOne()
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Point>()
+                .HasMany(p => p.Comments)
+                .WithOne(c => c.Point)
+                .HasForeignKey(c => c.PointId)
+                .OnDelete(DeleteBehavior.Cascade); 
         });
 
         modelBuilder.Entity<Comment>(entity =>

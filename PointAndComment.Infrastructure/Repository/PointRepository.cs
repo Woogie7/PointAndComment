@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using PointAndComment.Application.Interface;
 using PointAndComment.Application.Service;
 using PointAndComment.Domain.Entities;
 
-namespace PointAndComment.Infrastructure;
+namespace PointAndComment.Infrastructure.Repository;
 
 public class PointRepository : IPointRepository
 {
@@ -23,6 +24,9 @@ public class PointRepository : IPointRepository
     public async Task AddAsync(Point point) =>
         await _context.Points.AddAsync(point);
 
+    public async Task AddCommentAsync(Comment comment) =>
+        await _context.Comments.AddAsync(comment);
+
     public async Task DeleteAsync(Guid id)
     {
         var point = await GetByIdAsync(id);
@@ -39,5 +43,19 @@ public class PointRepository : IPointRepository
     public async Task SaveChangesAsync()
     {
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<Point?> GetByIdWithCommentsAsync(Guid id)
+    {
+        return await _context.Points
+            .Include(p => p.Comments)
+            .FirstOrDefaultAsync(p => p.Id == id);
+    }
+
+    public async Task<Point?> GetByCommentIdAsync(Guid commentId)
+    {
+        return await _context.Points
+            .Include(p => p.Comments)
+            .FirstOrDefaultAsync(p => p.Comments.Any(c => c.Id == commentId));
     }
 }

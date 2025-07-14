@@ -4,6 +4,7 @@ using PointAndComment.Application.DTO;
 using PointAndComment.Application.Interface;
 using PointAndComment.Application.Service;
 using PointAndComment.Infrastructure;
+using PointAndComment.Infrastructure.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,13 @@ builder.Services.AddDbContext<PointsAndCommentsDbContext>(options =>
 builder.Services.AddScoped<IPointRepository, PointRepository>();
 builder.Services.AddScoped<IPointService, PointService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+        policy.AllowAnyOrigin()   
+            .AllowAnyMethod()   
+            .AllowAnyHeader());
+});
 
 var app = builder.Build();
 
@@ -25,6 +33,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors();
 app.UseHttpsRedirection();
 
 app.MapGet("/points", async ([FromServices] IPointService service) =>
@@ -32,11 +41,16 @@ app.MapGet("/points", async ([FromServices] IPointService service) =>
     var points = await service.GetAllAsync();
     return Results.Ok(points);
 });
+app.MapGet("/points/{id:guid}", async (Guid id, [FromServices] IPointService service) =>
+{
+    var points = await service.GetByIdAsync(id);
+    return Results.Ok(points);
+});
 
 app.MapPost("/points", async ([FromBody] PointDto dto, [FromServices] IPointService service) =>
 {
-    await service.AddAsync(dto);
-    return Results.Created($"/points/{dto.Id}", dto);
+    var createdPoint = await service.AddAsync(dto);
+    return Results.Created($"/points/{dto.Id}", createdPoint);
 });
 
 app.MapDelete("/points/{id:guid}", async (Guid id, [FromServices] IPointService service) =>
